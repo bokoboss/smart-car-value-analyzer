@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Car Value Analyzer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4A90E2;
+            --primary-dark: #357ABD;
+            --secondary-color: #50E3C2;
+            --bg-color: #F4F7F9;
+            --card-bg-color: #FFFFFF;
+            --text-color: #4A4A4A;
+            --heading-color: #2C3E50;
+            --border-color: #EAEFEC;
+            --ice-color: #D0021B;
+            --hev-color: #F5A623;
+            --ev-color: #7ED321;
+            --success-color: #28a745;
+            --ai-button-bg: linear-gradient(135deg, #6e45e2 0%, #88d3ce 100%);
+            --font-primary: 'Prompt', sans-serif;
+            --font-secondary: 'Sarabun', sans-serif;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-secondary);
+            margin: 0;
+            padding: 2.5rem 1rem;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-family: var(--font-primary);
+            font-size: 2.75rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #7F8C9A;
+            margin-top: 0.5rem;
+        }
+
+        .step-card {
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.5rem;
+        }
+
+        .step-number {
+            background-color: var(--primary-color);
+            color: white;
+            font-family: var(--font-primary);
+            font-weight: 600;
+            font-size: 1.5rem;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .step-header h2 {
+            font-size: 1.75rem;
+            margin: 0;
+            color: var(--heading-color);
+        }
+
+        .step-header p {
+            margin: 0;
+            color: #7F8C9A;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group label {
+            font-weight: 500;
+            font-family: var(--font-primary);
+            color: #556270;
+            font-size: 0.9rem;
+        }
+
+        .input-group input, .input-group select {
+            padding: 12px 15px;
+            border: 1px solid #D1D9E0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: var(--font-secondary);
+            background-color: #F9FAFB;
+            transition: all 0.2s ease;
+        }
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        .api-key-group {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+        }
+        .api-key-group .input-group {
+            flex-grow: 1;
+        }
+        .help-btn {
+            background-color: #A0B2C2;
+            color: white;
+            border-radius: 8px;
+            width: 45px;
+            height: 45px;
+            padding: 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            flex-shrink: 0;
+            border: none;
+        }
+        .help-btn:hover {
+            background-color: #7F8C9A;
+        }
+
+        /* Car Finder */
+        .car-finder { border-top: 1px solid var(--border-color); margin-top: 2rem; padding-top: 2rem; }
+        .car-finder h3 { font-size: 1.25rem; color: var(--heading-color); }
+        #find-cars-btn { background-image: var(--ai-button-bg); border: none; }
+        .car-finder-results-container {
+            margin-top: 2rem;
+            display: none;
+        }
+        .car-finder-results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        .result-type-box h4 {
+            font-family: var(--font-primary);
+            margin: 0 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid;
+        }
+        .result-type-box[data-type="ice"] h4 { border-color: var(--ice-color); color: var(--ice-color); }
+        .result-type-box[data-type="hev"] h4 { border-color: var(--hev-color); color: var(--hev-color); }
+        .result-type-box[data-type="ev"] h4 { border-color: var(--ev-color); color: var(--ev-color); }
+        .result-type-box ul { list-style: none; padding: 0; margin: 0; }
+        .result-type-box li { padding: 0.5rem 0; font-size: 0.95rem; border-bottom: 1px solid var(--border-color); }
+        .result-type-box li:last-child { border-bottom: none; }
+
+        /* Car Comparison Cards */
+        #car-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .car-card {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            position: relative;
+            padding: 2rem;
+            border-top: 4px solid;
+        }
+        .car-card[data-car-type="ice"] { border-top-color: var(--ice-color); }
+        .car-card[data-car-type="hev"] { border-top-color: var(--hev-color); }
+        .car-card[data-car-type="ev"] { border-top-color: var(--ev-color); }
+        
+        .car-card h3 {
+            font-size: 1.25rem;
+            margin: 0 0 1.5rem 0;
+            color: var(--heading-color);
+        }
+
+        .remove-car-btn {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            background: #F4F7F9; color: #A0B2C2;
+            border: none; border-radius: 50%;
+            width: 30px; height: 30px;
+            font-size: 1.5rem; line-height: 1;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .remove-car-btn:hover { background: var(--ice-color); color: white; transform: rotate(90deg); }
+
+        .model-input-container { display: flex; gap: 0.5rem; }
+        .auto-fill-btn { padding: 10px 15px; font-size: 0.9rem; flex-shrink: 0; }
+        
+        /* Buttons */
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: var(--font-primary);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        button:hover { background-color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .add-car-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .add-car-buttons button { flex-grow: 1; padding: 14px; font-weight: 600; }
+        #add-ice { background-color: var(--ice-color); } #add-ice:hover { background-color: #a50215; }
+        #add-hev { background-color: var(--hev-color); } #add-hev:hover { background-color: #c1841a; }
+        #add-ev { background-color: var(--ev-color); } #add-ev:hover { background-color: #61a21a; }
+
+        #calculate-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.25rem;
+            background-color: var(--secondary-color);
+            border-radius: 12px;
+        }
+        #calculate-btn:hover { background-color: #41c3a6; }
+
+        /* Results Section */
+        #results-summary {
+            background: linear-gradient(135deg, #F6FEFC 0%, #F5FAFF 100%);
+            border: 1px solid var(--secondary-color);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        #results-summary p { margin: 0; font-size: 1.1rem; }
+        #results-summary .highlight {
+            font-family: var(--font-primary);
+            font-weight: 700;
+            font-size: 1.75rem;
+            color: var(--primary-dark);
+            display: block;
+            margin-top: 0.5rem;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2rem;
+        }
+        .results-table-container { grid-column: span 12; }
+        .chart-container { grid-column: span 12; md:grid-column: span 6; position: relative; height: 400px; }
+        .recommendation-section { grid-column: span 12; }
+
+        .tco-table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: right; border-bottom: 1px solid var(--border-color); }
+        th { text-align: left; font-family: var(--font-primary); font-weight: 600; color: #7F8C9A; }
+        tbody tr:last-child td { border-bottom: none; }
+        .net-cost-row { font-weight: bold; background-color: #F9FAFB; }
+        .net-cost-row td { font-size: 1.1rem; color: var(--heading-color); }
+
+        .recommendation-section {
+            background-color: #F5FAFF;
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid #D6E8FA;
+        }
+        .recommendation-section h3 { margin-top: 0; }
+        #gemini-analysis-btn { background-image: var(--ai-button-bg); border: none; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); display: flex;
+            justify-content: center; align-items: center; z-index: 1000;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease;
+        }
+        .modal-overlay.show { opacity: 1; visibility: visible; }
+        .modal-content {
+            background-color: white; padding: 2rem; border-radius: 16px;
+            max-width: 600px; width: 90%; box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            position: relative; transform: scale(0.95); transition: all 0.3s ease;
+        }
+        .modal-overlay.show .modal-content { transform: scale(1); }
+        .modal-close-btn {
+            position: absolute; top: 1rem; right: 1rem; background: none; border: none;
+            font-size: 2rem; color: #aaa; cursor: pointer;
+        }
+
+        @media (min-width: 768px) {
+            .results-table-container { grid-column: span 12; }
+            .chart-container { grid-column: span 6; }
+        }
+
+        @media (min-width: 1024px) {
+            .results-table-container { grid-column: span 7; }
+            .recommendation-section { grid-column: span 5; }
+            .chart-container { grid-column: span 6; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Smart Car Value Analyzer</h1>
+            <p class="subtitle">คู่มือวางแผนการเป็นเจ้าของรถยนต์อัจฉริยะด้วย AI</p>
+        </header>
+
+        <!-- Step 1: Setup & Discovery -->
+        <section class="step-card">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div>
+                    <h2>ตั้งค่าและค้นหา</h2>
+                    <p>กำหนดข้อมูลการใช้งานเบื้องต้น และค้นหารุ่นรถที่น่าสนใจในงบประมาณของคุณ</p>
+                </div>
+            </div>
+
+            <div class="grid-layout">
+                <div class="input-group">
+                    <label for="mileage-value">ระยะทางขับขี่เฉลี่ย (กม./ปี)</label>
+                    <input type="number" id="mileage-value" value="25000" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="comparison-period">ระยะเวลาเปรียบเทียบ (ปี)</label>
+                    <input type="number" id="comparison-period" value="7" min="1">
+                </div>
+                <div class="input-group">
+                    <label for="inflation-rate">อัตราเงินเฟ้อโดยประมาณ (% ต่อปี)</label>
+                    <input type="number" id="inflation-rate" value="2.5" min="0" step="0.1">
+                </div>
+                <div class="input-group">
+                    <label for="loan-interest-rate">อัตราดอกเบี้ยสินเชื่อ (% ต่อปี)</label>
+                    <input type="number" id="loan-interest-rate" value="3.5" min="0" step="0.1">
+                </div>
+            </div>
+
+            <div class="api-key-group" style="grid-column: 1 / -1; margin-top: 1.5rem;">
+                <div class="input-group">
+                    <label for="api-key-input">Google AI API Key</label>
+                    <input type="password" id="api-key-input" placeholder="วาง API Key เพื่อใช้ฟังก์ชันค้นหา Real-time">
+                </div>
+                <button type="button" class="help-btn" id="api-key-help-btn">?</button>
+            </div>
+
+            <div class="car-finder">
+                <h3>ค้นหารถยนต์ตามงบประมาณ</h3>
+                <div class="grid-layout">
+                    <div class="input-group">
+                        <label for="min-price">งบประมาณต่ำสุด (บาท)</label>
+                        <input type="number" id="min-price" value="700000" step="50000">
+                    </div>
+                    <div class="input-group">
+                        <label for="max-price">งบประมาณสูงสุด (บาท)</label>
+                        <input type="number" id="max-price" value="1200000" step="50000">
+                    </div>
+                    <div class="input-group">
+                        <label for="car-segment">ประเภทรถ (Segment)</label>
+                        <select id="car-segment">
+                            <option value="all">ทุกประเภท</option>
+                            <option value="City Car / Eco Car">City Car / Eco Car</option>
+                            <option value="B-Segment Sedan / Hatchback">B-Segment (เก๋งเล็ก)</option>
+                            <option value="C-Segment Sedan / Hatchback">C-Segment (เก๋งกลาง)</option>
+                            <option value="SUV">SUV</option>
+                            <option value="PPV">PPV</option>
+                            <option value="Pickup Truck">รถกระบะ (Pickup)</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="justify-content: flex-end;">
+                         <button type="button" id="find-cars-btn">ค้นหารุ่นรถ ✨</button>
+                    </div>
+                </div>
+                <div id="car-finder-results" class="car-finder-results-container"></div>
+            </div>
+        </section>
+
+        <!-- Step 2: Compare Cars -->
+        <section class="step-card">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <div>
+                    <h2>เปรียบเทียบรถ</h2>
+                    <p>เพิ่มรถยนต์รุ่นที่สนใจเพื่อนำมาคำนวณและเปรียบเทียบค่าใช้จ่ายทั้งหมด</p>
+                </div>
+            </div>
+            <div id="car-list"></div>
+            <div class="add-car-buttons">
+                <button type="button" id="add-ice">+ เพิ่มรถสันดาป (ICE)</button>
+                <button type="button" id="add-hev">+ เพิ่มรถไฮบริด (HEV)</button>
+                <button type="button" id="add-ev">+ เพิ่มรถไฟฟ้า (EV)</button>
+            </div>
+        </section>
+
+        <!-- Step 3: Calculation & Results -->
+         <div style="text-align: center; margin-bottom: 2.5rem;">
+            <button type="button" id="calculate-btn">คำนวณและวิเคราะห์ผล</button>
+        </div>
+
+        <section class="step-card results" style="display: none;">
+             <div class="step-header">
+                <div class="step-number">3</div>
+                <div>
+                    <h2>ผลลัพธ์และบทวิเคราะห์</h2>
+                    <p>สรุปค่าใช้จ่าย, กราฟเปรียบเทียบ, และคำแนะนำจาก AI</p>
+                </div>
+            </div>
+            
+            <div id="results-summary"></div>
+            
+            <div class="results-grid">
+                <div class="results-table-container">
+                    <h3>ตารางสรุปค่าใช้จ่ายสุทธิ</h3>
+                    <div class="tco-table-container" id="tco-table-container"></div>
+                </div>
+
+                <div class="recommendation-section">
+                    <h3>บทวิเคราะห์และคำแนะนำ</h3>
+                    <div id="initial-recommendation"></div>
+                    <button id="gemini-analysis-btn">✨ วิเคราะห์เชิงลึกด้วย AI ✨</button>
+                    <div id="gemini-recommendation" style="margin-top: 1rem; white-space: pre-wrap;"></div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>ค่าใช้จ่ายสุทธิ (Bar Chart)</h3>
+                    <canvas id="netCostChart"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <h3>จุดคุ้มทุน (Line Chart)</h3>
+                    <canvas id="breakEvenChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Template for Car Input Card -->
+    <template id="car-input-template">
+        <div class="car-card" data-car-type="">
+            <button type="button" class="remove-car-btn">&times;</button>
+            <h3><span class="car-type-label"></span></h3>
+            <div class="grid-layout">
+                <div class="input-group" style="grid-column: 1 / -1;">
+                    <label>ชื่อรุ่นรถ</label>
+                    <div class="model-input-container">
+                        <input type="text" class="car-model" placeholder="เช่น Toyota Yaris Cross HEV">
+                        <button type="button" class="auto-fill-btn">ค้นหา ✨</button>
+                    </div>
+                </div>
+                <div class="input-group"> <label>ราคารถยนต์ (บาท)</label> <input type="number" class="car-price"> </div>
+                <div class="input-group"> <label>เงินดาวน์ (บาท)</label> <input type="number" class="down-payment"> </div>
+                <div class="input-group"> <label>มูลค่าขายต่อ (บาท)</label> <input type="number" class="resale-value"> </div>
+                <div class="input-group"> <label>ค่าบำรุงรักษา/ปี (บาท)</label> <input type="number" class="maintenance-cost-annual"> </div>
+                <div class="input-group"> <label>ค่าประกันภัย/ปี (บาท)</label> <input type="number" class="insurance-cost-annual"> </div>
+                <div class="input-group"> <label>ภาษีรถยนต์/ปี (บาท)</label> <input type="number" class="annual-tax"> </div>
+
+                <div class="fuel-inputs" style="display: none; grid-column: 1 / -1;"><div class="grid-layout">
+                    <div class="input-group"> <label>อัตราสิ้นเปลือง (กม./ลิตร)</label> <input type="number" class="fuel-efficiency-kmpl"> </div>
+                    <div class="input-group"> <label>ราคาเชื้อเพลิง (บาท/ลิตร)</label> <input type="number" class="fuel-price-per-liter"> </div>
+                </div></div>
+
+                <div class="battery-inputs" style="display: none; grid-column: 1 / -1;"><div class="grid-layout">
+                    <div class="input-group"> <label>ราคาเปลี่ยนแบตเตอรี่ (บาท)</label> <input type="number" class="battery-replacement-cost"> </div>
+                    <div class="input-group"> <label>อายุแบตเตอรี่ (ปี)</label> <input type="number" class="battery-lifespan-years"> </div>
+                </div></div>
+
+                 <div class="ev-subsidy-input" style="display: none; grid-column: 1 / -1;"><div class="grid-layout">
+                     <div class="input-group"> <label>เงินอุดหนุนจากภาครัฐ (บาท)</label> <input type="number" class="ev-subsidy"> </div>
+                </div></div>
+                
+                <div class="ev-inputs" style="display: none; grid-column: 1 / -1;"><div class="grid-layout" style="grid-template-columns: 1fr 1fr;">
+                    <div class="input-group"> <label>อัตราสิ้นเปลือง (กม./kWh)</label> <input type="number" class="ev-efficiency-kmperkwh"> </div>
+                    <div class="input-group"> <label>ค่าไฟบ้าน (บาท/kWh)</label> <input type="number" class="home-electricity-price"> </div>
+                    <div class="input-group"> <label>สัดส่วนชาร์จบ้าน (%)</label> <input type="number" class="home-charge-percentage"> </div>
+                    <div class="input-group"> <label>ค่าไฟสถานีชาร์จ (บาท/kWh)</label> <input type="number" class="public-charge-price"> </div>
+                    <div class="input-group" style="grid-column: 1 / -1;"> <label>ค่าติดตั้ง Wall Charger (บาท)</label> <input type="number" class="wall-charger-cost"> </div>
+                </div></div>
+            </div>
+        </div>
+    </template>
+    
+    <!-- API Key Help Modal -->
+    <div class="modal-overlay" id="api-key-modal">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+            <h3>วิธีสร้าง API Key สำหรับ Google AI</h3>
+            <ol>
+                <li>ไปที่เว็บไซต์ <a href="https://aistudio.google.com/" target="_blank">Google AI Studio</a> และล็อกอินด้วยบัญชี Google</li>
+                <li>คลิกปุ่ม <strong>"Get API key"</strong> (อาจอยู่ที่เมนูด้านซ้าย)</li>
+                <li>คลิกที่ <strong>"Create API key in new project"</strong></li>
+                <li>คัดลอก Key ที่สร้างขึ้นมา แล้วนำมาวางในช่อง API Key ในหน้านี้</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Element References ---
+            const annualMileageInput = document.getElementById('mileage-value');
+            const comparisonPeriodInput = document.getElementById('comparison-period');
+            const inflationRateInput = document.getElementById('inflation-rate');
+            const loanInterestRateInput = document.getElementById('loan-interest-rate');
+            const carListDiv = document.getElementById('car-list');
+            const carInputTemplate = document.getElementById('car-input-template');
+            const addIceBtn = document.getElementById('add-ice');
+            const addHevBtn = document.getElementById('add-hev');
+            const addEvBtn = document.getElementById('add-ev');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const resultsSection = document.querySelector('.results');
+            const resultsSummaryDiv = document.getElementById('results-summary');
+            const tcoTableContainer = document.getElementById('tco-table-container');
+            
+            const initialRecommendationDiv = document.getElementById('initial-recommendation');
+            const geminiAnalysisBtn = document.getElementById('gemini-analysis-btn');
+            const geminiRecommendationDiv = document.getElementById('gemini-recommendation');
+
+            const netCostChartCanvas = document.getElementById('netCostChart');
+            const breakEvenChartCanvas = document.getElementById('breakEvenChart');
+            
+            const apiKeyInput = document.getElementById('api-key-input');
+            const apiKeyHelpBtn = document.getElementById('api-key-help-btn');
+            const apiKeyModal = document.getElementById('api-key-modal');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+
+            // Car Finder Elements
+            const findCarsBtn = document.getElementById('find-cars-btn');
+            const minPriceInput = document.getElementById('min-price');
+            const maxPriceInput = document.getElementById('max-price');
+            const carSegmentSelect = document.getElementById('car-segment');
+            const carFinderResultsDiv = document.getElementById('car-finder-results');
+
+            let cars = [];
+            let lastCalculations = [];
+            let netCostChartInstance = null;
+            let breakEvenChartInstance = null;
+
+            // --- Modal Logic ---
+            apiKeyHelpBtn.addEventListener('click', () => apiKeyModal.classList.add('show'));
+            modalCloseBtn.addEventListener('click', () => apiKeyModal.classList.remove('show'));
+            apiKeyModal.addEventListener('click', (e) => {
+                if (e.target === apiKeyModal) apiKeyModal.classList.remove('show');
+            });
+            
+            // --- API Call Helper ---
+            const callGeminiAPI = async (userQuery, useSearch = false) => {
+                const apiKey = apiKeyInput.value.trim();
+                 if (!apiKey && (useSearch || userQuery.includes("latest data"))) {
+                    alert('กรุณาใส่ Google AI API Key เพื่อใช้ฟังก์ชันค้นหาข้อมูล Real-time');
+                    apiKeyInput.focus();
+                    return null;
+                }
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    ...(useSearch && { tools: [{ "google_search": {} }] })
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.json();
+                    console.error("API Error Response:", errorBody);
+                    throw new Error(`API error: ${response.status} ${errorBody.error?.message || response.statusText}`);
+                }
+                
+                const result = await response.json();
+                const textResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!textResponse) throw new Error("No content received from API.");
+                
+                return textResponse;
+            };
+            
+             // --- Car Finder Logic ---
+            const findCarsByBudget = async () => {
+                const minPrice = getNumericValue(document, '#min-price');
+                const maxPrice = getNumericValue(document, '#max-price');
+                const segment = carSegmentSelect.value;
+
+                if (minPrice >= maxPrice) {
+                    alert('งบประมาณต่ำสุดต้องน้อยกว่างบประมาณสูงสุด');
+                    return;
+                }
+
+                findCarsBtn.disabled = true;
+                findCarsBtn.textContent = '🧠 AI กำลังค้นหา...';
+                carFinderResultsDiv.style.display = 'block';
+                carFinderResultsDiv.innerHTML = '<p>กรุณารอสักครู่...</p>';
+
+                const segmentFilter = segment === 'all' ? '' : `in the "${segment}" segment `;
+                const userQuery = `Based on the latest car market information in Thailand for 2024-2025, list popular car models ${segmentFilter}for ICE, HEV, and EV types available within the price range of ${minPrice.toLocaleString()} to ${maxPrice.toLocaleString()} THB. Respond ONLY with a valid JSON string. The JSON object must have three keys: "ice", "hev", and "ev". Each key must contain an array of strings (car model names). If no models are found, return an empty array.`;
+
+                try {
+                    const textResponse = await callGeminiAPI(userQuery, true);
+                    const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
+                    if (!jsonMatch) throw new Error("AI did not return valid JSON.");
+
+                    const carData = JSON.parse(jsonMatch[0]);
+                    const types = { ice: "รถสันดาป (ICE)", hev: "รถไฮบริด (HEV)", ev: "รถไฟฟ้า (EV)" };
+                    
+                    let html = '<div class="car-finder-results-grid">';
+                    for (const type in types) {
+                        html += `<div class="result-type-box" data-type="${type}"><h4>${types[type]}</h4>`;
+                        if (carData[type] && carData[type].length > 0) {
+                            html += '<ul>';
+                            carData[type].forEach(model => { html += `<li>${model}</li>`; });
+                            html += '</ul>';
+                        } else {
+                            html += `<p>ไม่พบรุ่นรถในงบประมาณนี้</p>`;
+                        }
+                        html += `</div>`;
+                    }
+                    html += '</div>';
+                    carFinderResultsDiv.innerHTML = html;
+                } catch (error) {
+                    console.error("Find Cars API call failed:", error);
+                    carFinderResultsDiv.innerHTML = `<p style="color: red;">เกิดข้อผิดพลาด: ${error.message}</p>`;
+                } finally {
+                    findCarsBtn.disabled = false;
+                    findCarsBtn.textContent = 'ค้นหารุ่นรถ ✨';
+                }
+            };
+            findCarsBtn.addEventListener('click', findCarsByBudget);
+            
+            // --- Auto-fill Logic ---
+            const autoFillCarData = async (carCardElement) => {
+                const carModel = carCardElement.querySelector('.car-model').value.trim();
+                if (!carModel) return alert('กรุณาป้อนชื่อรุ่นรถ');
+
+                const button = carCardElement.querySelector('.auto-fill-btn');
+                button.disabled = true;
+                button.textContent = '...';
+
+                const userQuery = `Find the latest data for the car model: "${carModel}" in Thailand. Respond ONLY with a valid JSON string with keys: "price", "maintenance" (estimated annual), "insurance" (estimated annual class 1), "tax" (estimated annual). Use 0 if a value is not found.`;
+
+                try {
+                    const textResponse = await callGeminiAPI(userQuery, true);
+                    const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
+                    if (!jsonMatch) throw new Error("AI did not return valid JSON.");
+                    
+                    const data = JSON.parse(jsonMatch[0]);
+                    const fields = { price: '.car-price', maintenance: '.maintenance-cost-annual', insurance: '.insurance-cost-annual', tax: '.annual-tax' };
+                    for (const key in fields) {
+                        if (data[key] && data[key] > 0) carCardElement.querySelector(fields[key]).value = data[key];
+                    }
+                } catch (error) {
+                    alert(`ไม่สามารถค้นหาข้อมูลได้: ${error.message}`);
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'ค้นหา ✨';
+                }
+            };
+
+            // --- Gemini Analysis Logic ---
+            const getGeminiAnalysis = async () => {
+                if (lastCalculations.length === 0) return;
+
+                geminiAnalysisBtn.disabled = true;
+                geminiAnalysisBtn.textContent = '🧠 AI กำลังวิเคราะห์...';
+                geminiRecommendationDiv.innerHTML = '<p>กรุณารอสักครู่...</p>';
+
+                const dataSummary = `**User Profile:** Driving ${getNumericValue(document, '#mileage-value').toLocaleString()} km/year, comparing over ${getNumericValue(document, '#comparison-period')} years. **Car Data:** ${JSON.stringify(lastCalculations.map(c => ({ model: c.model, type: c.type, netCost: c.netCostOfOwnership, fuelCost: c.fuel, maintenanceCost: c.maintenance })))}.`;
+                const systemPrompt = "You are a friendly automotive financial advisor in Thailand. Analyze the user's data and provide a detailed, neutral, and helpful recommendation in Thai. Consider their driving style (from mileage) and the current Thai context.";
+                const userQuery = `Based on this data, please provide a detailed analysis and recommendation. What other factors should I consider besides the numbers (e.g., lifestyle, convenience, future trends)?\n\n${dataSummary}`;
+                
+                try {
+                    const textResponse = await callGeminiAPI(userQuery, false); // No search needed here
+                    geminiRecommendationDiv.innerHTML = textResponse.replace(/\n/g, '<br>');
+                } catch (error) {
+                    geminiRecommendationDiv.innerHTML = `<p style="color: red;">เกิดข้อผิดพลาด: ${error.message}</p>`;
+                } finally {
+                    geminiAnalysisBtn.disabled = false;
+                    geminiAnalysisBtn.textContent = '✨ วิเคราะห์เชิงลึกด้วย AI ✨';
+                }
+            };
+            geminiAnalysisBtn.addEventListener('click', getGeminiAnalysis);
+            
+            // --- Car Management ---
+            const addCarInput = (type) => {
+                const newCarCard = carInputTemplate.content.cloneNode(true).firstElementChild;
+                newCarCard.dataset.carId = `car-${Date.now()}`;
+                newCarCard.dataset.carType = type;
+
+                const typeLabel = newCarCard.querySelector('.car-type-label');
+                const fuelInputs = newCarCard.querySelector('.fuel-inputs');
+                const batteryInputs = newCarCard.querySelector('.battery-inputs');
+                const evInputs = newCarCard.querySelector('.ev-inputs');
+                const evSubsidyInput = newCarCard.querySelector('.ev-subsidy-input');
+                
+                const setValues = (config) => {
+                    typeLabel.textContent = config.label;
+                    newCarCard.querySelector('.car-model').value = `${config.label} #${cars.filter(c => c.type === type).length + 1}`;
+                    for(const selector in config.values) {
+                        newCarCard.querySelector(selector).value = config.values[selector];
+                    }
+                    fuelInputs.style.display = config.show.includes('fuel') ? 'block' : 'none';
+                    batteryInputs.style.display = config.show.includes('battery') ? 'block' : 'none';
+                    evInputs.style.display = config.show.includes('ev') ? 'block' : 'none';
+                    evSubsidyInput.style.display = config.show.includes('subsidy') ? 'block' : 'none';
+                };
+
+                const configs = {
+                    ice: { label: 'สันดาป (ICE)', show: ['fuel'], values: { '.car-price': 850000, '.resale-value': 380000, '.maintenance-cost-annual': 8000, '.insurance-cost-annual': 18000, '.annual-tax': 2500, '.fuel-efficiency-kmpl': 16, '.fuel-price-per-liter': 38 } },
+                    hev: { label: 'ไฮบริด (HEV)', show: ['fuel', 'battery'], values: { '.car-price': 950000, '.resale-value': 450000, '.maintenance-cost-annual': 7000, '.insurance-cost-annual': 20000, '.annual-tax': 2000, '.fuel-efficiency-kmpl': 22, '.fuel-price-per-liter': 38, '.battery-replacement-cost': 80000, '.battery-lifespan-years': 8 } },
+                    ev: { label: 'ไฟฟ้า (EV)', show: ['battery', 'ev', 'subsidy'], values: { '.car-price': 1100000, '.resale-value': 550000, '.maintenance-cost-annual': 4000, '.insurance-cost-annual': 25000, '.annual-tax': 500, '.battery-replacement-cost': 400000, '.battery-lifespan-years': 8, '.ev-efficiency-kmperkwh': 7, '.home-electricity-price': 4.7, '.home-charge-percentage': 90, '.public-charge-price': 7.5, '.wall-charger-cost': 35000, '.ev-subsidy': 100000 } }
+                };
+                
+                setValues(configs[type]);
+
+                newCarCard.querySelector('.remove-car-btn').addEventListener('click', () => {
+                    newCarCard.remove();
+                    cars = cars.filter(car => car.id !== newCarCard.dataset.carId);
+                });
+                newCarCard.querySelector('.auto-fill-btn').addEventListener('click', () => autoFillCarData(newCarCard));
+
+                carListDiv.appendChild(newCarCard);
+                cars.push({ id: newCarCard.dataset.carId, type: type, element: newCarCard });
+            };
+            addIceBtn.addEventListener('click', () => addCarInput('ice'));
+            addHevBtn.addEventListener('click', () => addCarInput('hev'));
+            addEvBtn.addEventListener('click', () => addCarInput('ev'));
+
+            // --- Main Calculation Logic ---
+            const getNumericValue = (parent, selector, def = 0) => parseFloat(parent.querySelector(selector)?.value) || def;
+            
+            calculateBtn.addEventListener('click', () => {
+                if (cars.length === 0) return alert("กรุณาเพิ่มรถยนต์อย่างน้อยหนึ่งคัน");
+
+                const annualMileage = getNumericValue(document, '#mileage-value');
+                const comparisonPeriod = getNumericValue(document, '#comparison-period');
+                const inflationRate = getNumericValue(document, '#inflation-rate') / 100;
+                const loanInterestRate = getNumericValue(document, '#loan-interest-rate') / 100;
+
+                lastCalculations = cars.map(car => {
+                    const el = car.element;
+                    const data = {
+                        model: el.querySelector('.car-model').value.trim(), type: car.type,
+                        carPrice: getNumericValue(el, '.car-price'), evSubsidy: getNumericValue(el, '.ev-subsidy'),
+                        resaleValue: getNumericValue(el, '.resale-value'), downPayment: getNumericValue(el, '.down-payment'),
+                        maintenanceCostAnnual: getNumericValue(el, '.maintenance-cost-annual'),
+                        insuranceCostAnnual: getNumericValue(el, '.insurance-cost-annual'), annualTax: getNumericValue(el, '.annual-tax'),
+                        wallChargerCost: getNumericValue(el, '.wall-charger-cost'), cumulativeCostsPerYear: []
+                    };
+
+                    data.effectiveCarPrice = data.carPrice - data.evSubsidy;
+                    data.loanAmount = data.effectiveCarPrice - data.downPayment;
+                    
+                    let totalLoanInterest = 0;
+                    if (data.loanAmount > 0 && loanInterestRate > 0) {
+                        const monthlyRate = loanInterestRate / 12;
+                        const numPayments = comparisonPeriod * 12;
+                        const monthlyPayment = data.loanAmount * monthlyRate / (1 - Math.pow(1 + monthlyRate, -numPayments));
+                        totalLoanInterest = (monthlyPayment * numPayments) - data.loanAmount;
+                    }
+                    data.totalLoanInterest = totalLoanInterest > 0 ? totalLoanInterest : 0;
+                    
+                    let runningCosts = { fuel: 0, maintenance: 0, insurance: 0, tax: 0, battery: 0 };
+                    let cumulativeExpenditure = data.effectiveCarPrice + data.totalLoanInterest + data.wallChargerCost;
+                    data.cumulativeCostsPerYear.push(cumulativeExpenditure);
+
+                    for (let year = 1; year <= comparisonPeriod; year++) {
+                        const inflation = Math.pow(1 + inflationRate, year - 1);
+                        const yearlyCost = {
+                            maintenance: data.maintenanceCostAnnual * inflation,
+                            insurance: data.insuranceCostAnnual * inflation,
+                            tax: data.annualTax, fuel: 0, battery: 0
+                        };
+
+                        if (car.type === 'ice' || car.type === 'hev') {
+                            const efficiency = getNumericValue(el, '.fuel-efficiency-kmpl');
+                            if (efficiency > 0) yearlyCost.fuel = (annualMileage / efficiency) * (getNumericValue(el, '.fuel-price-per-liter') * inflation);
+                        } else if (car.type === 'ev') {
+                            const efficiency = getNumericValue(el, '.ev-efficiency-kmperkwh');
+                            if (efficiency > 0) {
+                                const kwh = annualMileage / efficiency;
+                                const homePct = getNumericValue(el, '.home-charge-percentage', 90) / 100;
+                                yearlyCost.fuel = (kwh * homePct * (getNumericValue(el, '.home-electricity-price') * inflation)) + (kwh * (1 - homePct) * (getNumericValue(el, '.public-charge-price') * inflation));
+                            }
+                        }
+
+                        const batteryLifespan = getNumericValue(el, '.battery-lifespan-years');
+                        if (batteryLifespan > 0 && year === batteryLifespan) {
+                            yearlyCost.battery = getNumericValue(el, '.battery-replacement-cost') * inflation;
+                        }
+
+                        Object.keys(runningCosts).forEach(key => runningCosts[key] += yearlyCost[key]);
+                        cumulativeExpenditure += Object.values(yearlyCost).reduce((a, b) => a + b, 0);
+                        data.cumulativeCostsPerYear.push(cumulativeExpenditure);
+                    }
+
+                    return { ...data, ...runningCosts, totalExpenditure: cumulativeExpenditure, netCostOfOwnership: cumulativeExpenditure - data.resaleValue };
+                });
+
+                displayResults(lastCalculations, comparisonPeriod);
+            });
+            
+            // --- Display Logic ---
+            const displayResults = (calculations, comparisonPeriod) => {
+                resultsSection.style.display = 'block';
+                geminiRecommendationDiv.innerHTML = '';
+                
+                calculations.sort((a, b) => a.netCostOfOwnership - b.netCostOfOwnership);
+                const bestCar = calculations[0];
+                let summaryHTML = `<p>${bestCar.model} (${bestCar.type.toUpperCase()}) คือตัวเลือกที่คุ้มค่าที่สุด</p><p>ค่าใช้จ่ายสุทธิ ${comparisonPeriod} ปี อยู่ที่ <span class="highlight">${bestCar.netCostOfOwnership.toLocaleString('th-TH', { style: 'currency', currency: 'THB', maximumFractionDigits: 0 })}</span></p>`;
+                if (calculations.length > 1) {
+                    summaryHTML += `<p>ประหยัดกว่า ${calculations[1].model} ประมาณ <span class="highlight">${(calculations[1].netCostOfOwnership - bestCar.netCostOfOwnership).toLocaleString('th-TH', { style: 'currency', currency: 'THB', maximumFractionDigits: 0 })}</span></p>`;
+                }
+                resultsSummaryDiv.innerHTML = summaryHTML;
+
+                const tableHeaders = `<thead><tr><th>รายการ</th>${calculations.map(c => `<th>${c.model}<br>(${c.type.toUpperCase()})</th>`).join('')}</tr></thead>`;
+                const tableRows = [
+                    { l: 'ราคารถยนต์', k: 'carPrice' }, { l: 'เงินอุดหนุน (EV)', k: 'evSubsidy' },
+                    { l: 'ราคาหลังหักเงินอุดหนุน', k: 'effectiveCarPrice' }, { l: 'เงินดาวน์', k: 'downPayment' },
+                    { l: 'ยอดจัดสินเชื่อ', k: 'loanAmount' }, { l: 'ดอกเบี้ยสินเชื่อรวม', k: 'totalLoanInterest' },
+                    { l: 'ค่าเชื้อเพลิง/ไฟฟ้า', k: 'fuel' }, { l: 'ค่าบำรุงรักษา', k: 'maintenance' },
+                    { l: 'ค่าประกันภัย', k: 'insurance' }, { l: 'ภาษีรถยนต์', k: 'tax' },
+                    { l: 'ค่าเปลี่ยนแบตเตอรี่', k: 'battery' }, { l: 'ค่าติดตั้ง Wall Charger', k: 'wallChargerCost' },
+                    { l: 'รวมค่าใช้จ่าย', k: 'totalExpenditure' }, { l: '(-) มูลค่าขายต่อ', k: 'resaleValue' },
+                    { l: `ค่าใช้จ่ายสุทธิ ${comparisonPeriod} ปี`, k: 'netCostOfOwnership', c: 'net-cost-row' }
+                ].map(cat => {
+                    if (calculations.every(c => !c[cat.k])) return '';
+                    const cells = calculations.map(c => `<td>${(c[cat.k] || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>`).join('');
+                    return `<tr class="${cat.c || ''}"><td>${cat.l}</td>${cells}</tr>`;
+                }).join('');
+                tcoTableContainer.innerHTML = `<table>${tableHeaders}<tbody>${tableRows}</tbody></table>`;
+                
+                const chartOptions = (type) => ({
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => v.toLocaleString() } } },
+                    plugins: { legend: { display: type === 'line' }, tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y.toLocaleString()} บาท` } } }
+                });
+
+                if (netCostChartInstance) netCostChartInstance.destroy();
+                netCostChartInstance = new Chart(netCostChartCanvas, {
+                    type: 'bar',
+                    options: chartOptions('bar'),
+                    data: {
+                        labels: calculations.map(c => c.model),
+                        datasets: [{
+                            label: `ค่าใช้จ่ายสุทธิ ${comparisonPeriod} ปี`,
+                            data: calculations.map(c => c.netCostOfOwnership),
+                            backgroundColor: calculations.map(c => ({'ice': 'rgba(208, 2, 27, 0.7)', 'hev': 'rgba(245, 166, 35, 0.7)', 'ev': 'rgba(126, 211, 33, 0.7)'}[c.type])),
+                            borderColor: calculations.map(c => ({'ice': '#D0021B', 'hev': '#F5A623', 'ev': '#7ED321'}[c.type])),
+                            borderWidth: 1,
+                            borderRadius: 6,
+                        }]
+                    },
+                });
+
+                if (breakEvenChartInstance) breakEvenChartInstance.destroy();
+                breakEvenChartInstance = new Chart(breakEvenChartCanvas, {
+                    type: 'line',
+                    options: chartOptions('line'),
+                    data: {
+                        labels: Array.from({ length: comparisonPeriod + 1 }, (_, i) => `ปีที่ ${i}`),
+                        datasets: calculations.map(c => ({
+                            label: c.model,
+                            data: c.cumulativeCostsPerYear,
+                            borderColor: ({'ice': '#D0021B', 'hev': '#F5A623', 'ev': '#7ED321'}[c.type]),
+                            backgroundColor: ({'ice': 'rgba(208, 2, 27, 0.1)', 'hev': 'rgba(245, 166, 35, 0.1)', 'ev': 'rgba(126, 211, 33, 0.1)'}[c.type]),
+                            fill: false, tension: 0.1
+                        }))
+                    },
+                });
+                
+                generateInitialRecommendation(calculations, getNumericValue(document, '#mileage-value'));
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+
+            // --- Initial Recommendation ---
+            const generateInitialRecommendation = (calculations, annualMileage) => {
+                const evCar = calculations.find(c => c.type === 'ev');
+                const iceCar = calculations.find(c => c.type === 'ice' || c.type === 'hev');
+                let recText = '';
+                if (annualMileage >= 20000) recText = '<strong>รถ EV น่าสนใจมาก:</strong> ด้วยระยะขับขี่ที่สูงของคุณ ทำให้ประหยัดค่าพลังงานได้เยอะและคืนทุนเร็ว';
+                else if (annualMileage >= 10000) recText = '<strong>พิจารณา EV ได้:</strong> ระยะขับขี่ระดับกลาง รถ EV ยังคงเป็นตัวเลือกที่ดีในระยะยาว';
+                else recText = '<strong>ICE/HEV อาจคุ้มกว่า:</strong> ระยะขับขี่ไม่สูงมาก การประหยัดค่าพลังงานจาก EV อาจไม่พอชดเชยราคารถ';
+
+                if (evCar && iceCar) {
+                    let breakEvenYear = -1;
+                    for (let year = 1; year < evCar.cumulativeCostsPerYear.length; year++) {
+                        if (evCar.cumulativeCostsPerYear[year] < iceCar.cumulativeCostsPerYear[year]) {
+                            breakEvenYear = year;
+                            break;
+                        }
+                    }
+                    if (breakEvenYear !== -1) recText += `<br><strong>จุดคุ้มทุน:</strong> ${evCar.model} จะเริ่มคุ้มกว่า ${iceCar.model} ใน<strong>ปีที่ ${breakEvenYear}</strong>`;
+                    else recText += `<br><strong>จุดคุ้มทุน:</strong> ภายในระยะเวลาที่เปรียบเทียบยังไม่มีจุดคุ้มทุนที่ชัดเจน`;
+                }
+                initialRecommendationDiv.innerHTML = `<p>${recText}</p>`;
+            };
+            
+            // --- Initial Setup ---
+            addCarInput('ice');
+            addCarInput('ev');
+        });
+    </script>
+</body>
+</html>
+
