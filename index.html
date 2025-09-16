@@ -336,6 +336,34 @@
             position: absolute; top: 1rem; right: 1rem; background: none; border: none;
             font-size: 2rem; color: #aaa; cursor: pointer;
         }
+        
+        /* --- NEW STYLES for Card Internals --- */
+        .grid-2-col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* more flexible */
+            gap: 1rem 1.5rem;
+        }
+        .card-divider {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+        .section-title {
+            font-family: var(--font-primary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--heading-color);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .specific-section {
+            display: none; /* Hide all by default */
+        }
+        .specific-section:not(:first-child) {
+            margin-top: 1.5rem;
+        }
 
         /* --- Responsive Adjustments --- */
         @media (min-width: 768px) {
@@ -470,7 +498,7 @@
                 <div class="step-number">2</div>
                 <div>
                     <h2>เปรียบเทียบรถ</h2>
-                    <p>เพิ่มรถยนต์รุ่นที่สนใจเพื่อนำมาคำนวณและเปรียบเทียบค่าใช้จ่ายทั้งหมด</p>
+                    <p>เพิ่มรถยนต์รุ่นที่สนใจเพื่อนำมาคำวณและเปรียบเทียบค่าใช้จ่ายทั้งหมด</p>
                 </div>
             </div>
             <div id="car-list"></div>
@@ -528,6 +556,8 @@
         <div class="car-card" data-car-type="">
             <button type="button" class="remove-car-btn">&times;</button>
             <h3><span class="car-type-label"></span></h3>
+            
+            <!-- Part 1: Common Details -->
             <div class="grid-layout">
                 <div class="input-group" style="grid-column: 1 / -1;">
                     <label>ชื่อรุ่นรถ</label>
@@ -542,28 +572,39 @@
                 <div class="input-group"> <label>ค่าบำรุงรักษา/ปี (บาท)</label> <input type="number" class="maintenance-cost-annual"> </div>
                 <div class="input-group"> <label>ค่าประกันภัย/ปี (บาท)</label> <input type="number" class="insurance-cost-annual"> </div>
                 <div class="input-group"> <label>ภาษีรถยนต์/ปี (บาท)</label> <input type="number" class="annual-tax"> </div>
+            </div>
 
-                <div class="fuel-inputs" style="display: none; grid-column: 1 / -1;"><div class="grid-layout" style="grid-template-columns: 1fr 1fr;">
-                    <div class="input-group"> <label>อัตราสิ้นเปลือง (กม./ลิตร)</label> <input type="number" class="fuel-efficiency-kmpl"> </div>
-                    <div class="input-group"> <label>ราคาเชื้อเพลิง (บาท/ลิตร)</label> <input type="number" class="fuel-price-per-liter"> </div>
-                </div></div>
+            <!-- Part 2: Type-Specific Details -->
+            <div class="card-divider">
+                <div class="specific-section fuel-section">
+                    <h4 class="section-title">ข้อมูลเชื้อเพลิง</h4>
+                    <div class="grid-2-col">
+                        <div class="input-group"> <label>อัตราสิ้นเปลือง (กม./ลิตร)</label> <input type="number" class="fuel-efficiency-kmpl"> </div>
+                        <div class="input-group"> <label>ราคาเชื้อเพลิง (บาท/ลิตร)</label> <input type="number" class="fuel-price-per-liter"> </div>
+                    </div>
+                </div>
 
-                <div class="battery-inputs" style="display: none; grid-column: 1 / -1;"><div class="grid-layout" style="grid-template-columns: 1fr 1fr;">
-                    <div class="input-group"> <label>ราคาเปลี่ยนแบตเตอรี่ (บาท)</label> <input type="number" class="battery-replacement-cost"> </div>
-                    <div class="input-group"> <label>อายุแบตเตอรี่ (ปี)</label> <input type="number" class="battery-lifespan-years"> </div>
-                </div></div>
+                <div class="specific-section battery-section">
+                    <h4 class="section-title">ข้อมูลแบตเตอรี่</h4>
+                    <div class="grid-2-col">
+                        <div class="input-group"> <label>ราคาเปลี่ยนแบตเตอรี่ (บาท)</label> <input type="number" class="battery-replacement-cost"> </div>
+                        <div class="input-group"> <label>อายุแบตเตอรี่ (ปี)</label> <input type="number" class="battery-lifespan-years"> </div>
+                    </div>
+                </div>
 
-                 <div class="ev-subsidy-input" style="display: none; grid-column: 1 / -1;"><div class="grid-layout">
+                <div class="specific-section ev-section">
+                     <h4 class="section-title">ข้อมูลเฉพาะรถไฟฟ้า</h4>
                      <div class="input-group"> <label>เงินอุดหนุนจากภาครัฐ (บาท)</label> <input type="number" class="ev-subsidy"> </div>
-                </div></div>
-                
-                <div class="ev-inputs" style="display: none; grid-column: 1 / -1;"><div class="grid-layout" style="grid-template-columns: 1fr 1fr;">
-                    <div class="input-group"> <label>อัตราสิ้นเปลือง (กม./kWh)</label> <input type="number" class="ev-efficiency-kmperkwh"> </div>
-                    <div class="input-group"> <label>ค่าไฟบ้าน (บาท/kWh)</label> <input type="number" class="home-electricity-price"> </div>
-                    <div class="input-group"> <label>สัดส่วนชาร์จบ้าน (%)</label> <input type="number" class="home-charge-percentage"> </div>
-                    <div class="input-group"> <label>ค่าไฟสถานีชาร์จ (บาท/kWh)</label> <input type="number" class="public-charge-price"> </div>
-                    <div class="input-group" style="grid-column: 1 / -1;"> <label>ค่าติดตั้ง Wall Charger (บาท)</label> <input type="number" class="wall-charger-cost"> </div>
-                </div></div>
+                     <div class="grid-2-col" style="margin-top: 1.5rem;">
+                        <div class="input-group"> <label>อัตราสิ้นเปลือง (กม./kWh)</label> <input type="number" class="ev-efficiency-kmperkwh"> </div>
+                        <div class="input-group"> <label>ค่าไฟบ้าน (บาท/kWh)</label> <input type="number" class="home-electricity-price"> </div>
+                        <div class="input-group"> <label>สัดส่วนชาร์จบ้าน (%)</label> <input type="number" class="home-charge-percentage"> </div>
+                        <div class="input-group"> <label>ค่าไฟสถานีชาร์จ (บาท/kWh)</label> <input type="number" class="public-charge-price"> </div>
+                    </div>
+                    <div class="input-group" style="margin-top: 1.5rem;"> 
+                        <label>ค่าติดตั้ง Wall Charger (บาท)</label> <input type="number" class="wall-charger-cost">
+                    </div>
+                </div>
             </div>
         </div>
     </template>
@@ -816,10 +857,9 @@
                 newCarCard.dataset.carType = type;
 
                 const typeLabel = newCarCard.querySelector('.car-type-label');
-                const fuelInputs = newCarCard.querySelector('.fuel-inputs');
-                const batteryInputs = newCarCard.querySelector('.battery-inputs');
-                const evInputs = newCarCard.querySelector('.ev-inputs');
-                const evSubsidyInput = newCarCard.querySelector('.ev-subsidy-input');
+                const fuelSection = newCarCard.querySelector('.fuel-section');
+                const batterySection = newCarCard.querySelector('.battery-section');
+                const evSection = newCarCard.querySelector('.ev-section');
                 
                 const setValues = (config) => {
                     typeLabel.textContent = config.label;
@@ -827,16 +867,15 @@
                     for(const selector in config.values) {
                         newCarCard.querySelector(selector).value = config.values[selector];
                     }
-                    fuelInputs.style.display = config.show.includes('fuel') ? 'block' : 'none';
-                    batteryInputs.style.display = config.show.includes('battery') ? 'block' : 'none';
-                    evInputs.style.display = config.show.includes('ev') ? 'block' : 'none';
-                    evSubsidyInput.style.display = config.show.includes('subsidy') ? 'block' : 'none';
+                    fuelSection.style.display = config.show.includes('fuel') ? 'block' : 'none';
+                    batterySection.style.display = config.show.includes('battery') ? 'block' : 'none';
+                    evSection.style.display = config.show.includes('ev') ? 'block' : 'none';
                 };
 
                 const configs = {
                     ice: { label: 'สันดาป (ICE)', show: ['fuel'], values: { '.car-price': 850000, '.resale-value': 380000, '.maintenance-cost-annual': 8000, '.insurance-cost-annual': 18000, '.annual-tax': 2500, '.fuel-efficiency-kmpl': 16, '.fuel-price-per-liter': 38 } },
                     hev: { label: 'ไฮบริด (HEV)', show: ['fuel', 'battery'], values: { '.car-price': 950000, '.resale-value': 450000, '.maintenance-cost-annual': 7000, '.insurance-cost-annual': 20000, '.annual-tax': 2000, '.fuel-efficiency-kmpl': 22, '.fuel-price-per-liter': 38, '.battery-replacement-cost': 80000, '.battery-lifespan-years': 8 } },
-                    ev: { label: 'ไฟฟ้า (EV)', show: ['battery', 'ev', 'subsidy'], values: { '.car-price': 1100000, '.resale-value': 550000, '.maintenance-cost-annual': 4000, '.insurance-cost-annual': 25000, '.annual-tax': 500, '.battery-replacement-cost': 400000, '.battery-lifespan-years': 8, '.ev-efficiency-kmperkwh': 7, '.home-electricity-price': 4.7, '.home-charge-percentage': 90, '.public-charge-price': 7.5, '.wall-charger-cost': 35000, '.ev-subsidy': 100000 } }
+                    ev: { label: 'ไฟฟ้า (EV)', show: ['battery', 'ev'], values: { '.car-price': 1100000, '.resale-value': 550000, '.maintenance-cost-annual': 4000, '.insurance-cost-annual': 25000, '.annual-tax': 500, '.battery-replacement-cost': 400000, '.battery-lifespan-years': 8, '.ev-efficiency-kmperkwh': 7, '.home-electricity-price': 4.7, '.home-charge-percentage': 90, '.public-charge-price': 7.5, '.wall-charger-cost': 35000, '.ev-subsidy': 100000 } }
                 };
                 
                 setValues(configs[type]);
@@ -1032,8 +1071,4 @@
     </script>
 </body>
 </html>
-
-
-
-" to answer the query.
 
