@@ -80,10 +80,18 @@
         .step-header {
             display: flex;
             align-items: center;
-            gap: 1rem; /* Tighter gap */
+            justify-content: space-between; /* Changed */
+            flex-wrap: wrap; /* Added */
+            gap: 1.5rem; /* Added */
             margin-bottom: 2rem;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 1.5rem;
+        }
+
+        .step-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .step-number {
@@ -257,8 +265,17 @@
         button:hover { background-color: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        .add-car-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
-        .add-car-buttons button { flex-grow: 1; padding: 14px; font-weight: 600; }
+        .add-car-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+        .add-car-buttons button {
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
         #add-ice { background-color: var(--ice-color); } #add-ice:hover { background-color: #a50215; }
         #add-hev { background-color: var(--hev-color); } #add-hev:hover { background-color: #c1841a; }
         #add-ev { background-color: var(--ev-color); } #add-ev:hover { background-color: #61a21a; }
@@ -420,10 +437,12 @@
         <!-- Step 1: Setup & Discovery -->
         <section class="step-card">
             <div class="step-header">
-                <div class="step-number">1</div>
-                <div>
-                    <h2>ตั้งค่าและค้นหา</h2>
-                    <p>กำหนดข้อมูลการใช้งานเบื้องต้น และค้นหารุ่นรถที่น่าสนใจในงบประมาณของคุณ</p>
+                <div class="step-header-left">
+                    <div class="step-number">1</div>
+                    <div>
+                        <h2>ตั้งค่าและค้นหา</h2>
+                        <p>กำหนดข้อมูลการใช้งานเบื้องต้น และค้นหารุ่นรถที่น่าสนใจในงบประมาณของคุณ</p>
+                    </div>
                 </div>
             </div>
 
@@ -495,18 +514,20 @@
         <!-- Step 2: Compare Cars -->
         <section class="step-card">
             <div class="step-header">
-                <div class="step-number">2</div>
-                <div>
-                    <h2>เปรียบเทียบรถ</h2>
-                    <p>เพิ่มรถยนต์รุ่นที่สนใจเพื่อนำมาคำวณและเปรียบเทียบค่าใช้จ่ายทั้งหมด</p>
+                <div class="step-header-left">
+                    <div class="step-number">2</div>
+                    <div>
+                        <h2>เปรียบเทียบรถ</h2>
+                        <p>เพิ่มรถยนต์รุ่นที่สนใจเพื่อนำมาคำวณและเปรียบเทียบค่าใช้จ่ายทั้งหมด</p>
+                    </div>
+                </div>
+                <div class="add-car-buttons">
+                    <button type="button" id="add-ice">+ สันดาป</button>
+                    <button type="button" id="add-hev">+ ไฮบริด</button>
+                    <button type="button" id="add-ev">+ ไฟฟ้า</button>
                 </div>
             </div>
-            <div id="car-list"></div>
-            <div class="add-car-buttons">
-                <button type="button" id="add-ice">+ เพิ่มรถสันดาป (ICE)</button>
-                <button type="button" id="add-hev">+ เพิ่มรถไฮบริด (HEV)</button>
-                <button type="button" id="add-ev">+ เพิ่มรถไฟฟ้า (EV)</button>
-            </div>
+            <div id="car-list" style="margin-top: 2rem;"></div>
         </section>
 
         <!-- Step 3: Calculation & Results -->
@@ -516,10 +537,12 @@
 
         <section class="step-card results" style="display: none;">
              <div class="step-header">
-                <div class="step-number">3</div>
-                <div>
-                    <h2>ผลลัพธ์และบทวิเคราะห์</h2>
-                    <p>สรุปค่าใช้จ่าย, กราฟเปรียบเทียบ, และคำแนะนำจาก AI</p>
+                <div class="step-header-left">
+                    <div class="step-number">3</div>
+                    <div>
+                        <h2>ผลลัพธ์และบทวิเคราะห์</h2>
+                        <p>สรุปค่าใช้จ่าย, กราฟเปรียบเทียบ, และคำแนะนำจาก AI</p>
+                    </div>
                 </div>
             </div>
             
