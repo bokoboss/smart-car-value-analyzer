@@ -15,7 +15,7 @@
             --primary-color: #4A90E2;
             --primary-dark: #357ABD;
             --secondary-color: #50E3C2;
-            --bg-color: #F4F7F9;
+            --bg-color: #F7F9FC; /* Lighter background */
             --card-bg-color: #FFFFFF;
             --text-color: #4A4A4A;
             --heading-color: #2C3E50;
@@ -27,6 +27,8 @@
             --ai-button-bg: linear-gradient(135deg, #6e45e2 0%, #88d3ce 100%);
             --font-primary: 'Prompt', sans-serif;
             --font-secondary: 'Sarabun', sans-serif;
+            --border-radius-md: 12px;
+            --border-radius-lg: 20px;
         }
 
         *, *::before, *::after {
@@ -36,7 +38,7 @@
         body {
             font-family: var(--font-secondary);
             margin: 0;
-            padding: 2.5rem 1rem;
+            padding: 2rem 1rem; /* Adjusted padding */
             background-color: var(--bg-color);
             color: var(--text-color);
             line-height: 1.6;
@@ -54,7 +56,7 @@
 
         h1 {
             font-family: var(--font-primary);
-            font-size: 2.75rem;
+            font-size: 2.5rem; /* Slightly smaller */
             font-weight: 700;
             color: var(--heading-color);
             margin: 0;
@@ -69,16 +71,16 @@
         .step-card {
             background-color: var(--card-bg-color);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 2.5rem;
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
             margin-bottom: 2.5rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            box-shadow: 0 8px 24px rgba(28, 46, 60, 0.08); /* Softer shadow */
         }
 
         .step-header {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 1rem; /* Tighter gap */
             margin-bottom: 2rem;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 1.5rem;
@@ -89,10 +91,10 @@
             color: white;
             font-family: var(--font-primary);
             font-weight: 600;
-            font-size: 1.5rem;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            font-size: 1.25rem;
+            border-radius: var(--border-radius-md); /* Rounded square */
+            width: 44px; /* Adjusted size */
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -100,7 +102,7 @@
         }
 
         .step-header h2 {
-            font-size: 1.75rem;
+            font-size: 1.5rem; /* Adjusted size */
             margin: 0;
             color: var(--heading-color);
         }
@@ -132,12 +134,12 @@
         .input-group input, .input-group select {
             padding: 12px 15px;
             border: 1px solid #D1D9E0;
-            border-radius: 8px;
+            border-radius: var(--border-radius-md);
             font-size: 1rem;
             font-family: var(--font-secondary);
             background-color: #F9FAFB;
             transition: all 0.2s ease;
-            width: 100%; /* Added this line to ensure input fits its container */
+            width: 100%;
         }
         .input-group input:focus, .input-group select:focus {
             outline: none;
@@ -157,7 +159,7 @@
         .help-btn {
             background-color: #A0B2C2;
             color: white;
-            border-radius: 8px;
+            border-radius: var(--border-radius-md);
             width: 45px;
             height: 45px;
             padding: 0;
@@ -173,7 +175,7 @@
         /* Car Finder */
         .car-finder { border-top: 1px solid var(--border-color); margin-top: 2rem; padding-top: 2rem; }
         .car-finder h3 { font-size: 1.25rem; color: var(--heading-color); }
-        #find-cars-btn { background-image: var(--ai-button-bg); border: none; }
+        #find-cars-btn { background-image: var(--ai-button-bg); border: none; border-radius: var(--border-radius-md); }
         .car-finder-results-container {
             margin-top: 2rem;
             display: none;
@@ -199,14 +201,14 @@
         /* Car Comparison Cards */
         #car-list {
             display: grid;
-            grid-template-columns: 1fr; /* Default: 1 column for mobile */
+            grid-template-columns: 1fr;
             gap: 2rem;
             margin-bottom: 2rem;
         }
         .car-card {
             background-color: white;
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: var(--border-radius-lg);
             box-shadow: 0 4px 15px rgba(0,0,0,0.04);
             position: relative;
             padding: 2rem;
@@ -230,7 +232,6 @@
             width: 30px; height: 30px;
             font-size: 1.5rem;
             cursor: pointer; transition: all 0.2s ease;
-            /* Use Flexbox for perfect centering */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -246,7 +247,7 @@
             color: white;
             padding: 12px 25px;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--border-radius-md); /* Consistent border radius */
             cursor: pointer;
             font-size: 1rem;
             font-family: var(--font-primary);
@@ -267,7 +268,7 @@
             padding: 18px;
             font-size: 1.25rem;
             background-color: var(--secondary-color);
-            border-radius: 12px;
+            border-radius: var(--border-radius-lg);
         }
         #calculate-btn:hover { background-color: #41c3a6; }
 
@@ -276,7 +277,7 @@
             background: linear-gradient(135deg, #F6FEFC 0%, #F5FAFF 100%);
             border: 1px solid var(--secondary-color);
             padding: 2rem;
-            border-radius: 12px;
+            border-radius: var(--border-radius-lg);
             text-align: center;
             margin-bottom: 2rem;
         }
@@ -296,20 +297,21 @@
             gap: 2rem;
         }
         .results-table-container { grid-column: span 12; }
-        .chart-container { grid-column: span 12; md:grid-column: span 6; position: relative; height: 400px; }
+        .chart-container { grid-column: span 12; position: relative; height: 400px; }
         .recommendation-section { grid-column: span 12; }
 
         .tco-table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 1rem; text-align: right; border-bottom: 1px solid var(--border-color); }
-        th { text-align: left; font-family: var(--font-primary); font-weight: 600; color: #7F8C9A; }
+        th { text-align: left; font-family: var(--font-primary); font-weight: 600; color: #7F8C9A; background-color: #F9FAFB; }
+        tbody tr:nth-child(even) { background-color: #F9FAFB; }
         tbody tr:last-child td { border-bottom: none; }
-        .net-cost-row { font-weight: bold; background-color: #F9FAFB; }
+        .net-cost-row { font-weight: bold; background-color: #eaf2fd; } /* Highlight row */
         .net-cost-row td { font-size: 1.1rem; color: var(--heading-color); }
 
         .recommendation-section {
             background-color: #F5FAFF;
-            border-radius: 12px;
+            border-radius: var(--border-radius-lg);
             padding: 2rem;
             border: 1px solid #D6E8FA;
         }
@@ -325,7 +327,7 @@
         }
         .modal-overlay.show { opacity: 1; visibility: visible; }
         .modal-content {
-            background-color: white; padding: 2rem; border-radius: 16px;
+            background-color: white; padding: 2rem; border-radius: var(--border-radius-lg);
             max-width: 600px; width: 90%; box-shadow: 0 5px 20px rgba(0,0,0,0.2);
             position: relative; transform: scale(0.95); transition: all 0.3s ease;
         }
@@ -335,32 +337,24 @@
             font-size: 2rem; color: #aaa; cursor: pointer;
         }
 
-        /* --- Responsive Adjustments for Car List & Results --- */
+        /* --- Responsive Adjustments --- */
         @media (min-width: 768px) {
-            #car-list {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .results-table-container { grid-column: span 12; }
+            #car-list { grid-template-columns: repeat(2, 1fr); }
             .chart-container { grid-column: span 6; }
         }
-
         @media (min-width: 1024px) {
             .results-table-container { grid-column: span 7; }
             .recommendation-section { grid-column: span 5; }
-            .chart-container { grid-column: span 6; }
         }
-
         @media (min-width: 1200px) {
-             #car-list {
-                grid-template-columns: repeat(3, 1fr);
-            }
+            #car-list { grid-template-columns: repeat(3, 1fr); }
         }
 
         /* --- Custom Styles for Unit Toggle Buttons --- */
         .unit-toggle {
             display: flex;
             border: 1px solid #D1D9E0;
-            border-radius: 8px;
+            border-radius: var(--border-radius-md);
             overflow: hidden;
             flex-shrink: 0;
         }
@@ -1040,4 +1034,6 @@
 </html>
 
 
+
+" to answer the query.
 
